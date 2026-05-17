@@ -1,0 +1,6 @@
+[tool.pyrefly]
+python-interpreter-path = "/home/ems-ridhes/Downloads/Expression_TTS/customer-support-ai/venv/bin/python"
+search-path = [
+    "/home/ems-ridhes/Downloads/Expression_TTS/customer-support-ai",
+    "/home/ems-ridhes/Downloads/Expression_TTS/customer-support-ai/venv/lib/python3.12/site-packages"
+]

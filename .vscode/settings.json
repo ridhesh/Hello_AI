@@ -1,0 +1,15 @@
+{
+  "python.defaultInterpreterPath": "/home/ems-ridhes/Downloads/Expression_TTS/customer-support-ai/venv/bin/python",
+  "python.analysis.extraPaths": [
+    "/home/ems-ridhes/Downloads/Expression_TTS/customer-support-ai",
+    "/home/ems-ridhes/Downloads/Expression_TTS/customer-support-ai/venv/lib/python3.12/site-packages"
+  ],
+  "python.autoComplete.extraPaths": [
+    "/home/ems-ridhes/Downloads/Expression_TTS/customer-support-ai",
+    "/home/ems-ridhes/Downloads/Expression_TTS/customer-support-ai/venv/lib/python3.12/site-packages"
+  ],
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports": "none"
+  },
+  "python.pyrefly.configPath": "/home/ems-ridhes/Downloads/Expression_TTS/pyproject.toml"
+}
