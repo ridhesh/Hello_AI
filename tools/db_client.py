@@ -57,6 +57,18 @@ def create_ticket(session_id: str, reason: str) -> int:
     ticket = Ticket(session_id=session_id, reason=reason, created_at=datetime.datetime.now().isoformat())
     session.add(ticket)
     session.commit()
-    ticket_id = ticket.id
+    ticket_id: int = ticket.id  # type: ignore
     session.close()
     return ticket_id
+
+def delete_ticket(ticket_id: int) -> bool:
+    session = Session()
+    ticket = session.query(Ticket).filter(Ticket.id == ticket_id).first()
+    if ticket:
+        session.delete(ticket)
+        session.commit()
+        
+        session.close()
+        return True
+    session.close()
+    return False

@@ -3,24 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <title>AI Support | Tickets Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
+            --bg: #090d16;
+            --card: rgba(30, 41, 59, 0.4);
             --primary: #f43f5e;
+            --primary-hover: #e11d48;
+            --primary-glow: rgba(244, 63, 94, 0.15);
             --text: #f8fafc;
             --text-muted: #94a3b8;
-            --glass: rgba(255, 255, 255, 0.05);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
         }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg);
             color: var(--text);
-            padding: 40px;
-            background: radial-gradient(circle at bottom left, #450a0a, #0f172a);
+            padding: 40px 20px;
+            background: radial-gradient(circle at bottom left, #450a0a, #090d16),
+                        radial-gradient(circle at top right, #0f172a, #090d16);
             min-height: 100vh;
         }
 
@@ -39,23 +44,78 @@
         h1 {
             font-family: 'Outfit', sans-serif;
             font-size: 32px;
-            background: linear-gradient(to right, #fb7185, #e11d48);
+            font-weight: 800;
+            background: linear-gradient(to right, #fb7185, #f43f5e);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .refresh-btn {
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
             background: var(--glass);
-            border: 1px solid var(--glass);
-            color: white;
+            border: 1px solid var(--glass-border);
+            color: var(--text);
             padding: 10px 20px;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-chat {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+        .btn-chat:hover {
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--glass-border);
+            padding: 24px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
             font-weight: 600;
         }
 
-        .refresh-btn:hover { background: rgba(255, 255, 255, 0.1); }
+        .stat-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #fb7185;
+        }
 
         .ticket-grid {
             display: grid;
@@ -67,45 +127,63 @@
             background: var(--card);
             padding: 24px;
             border-radius: 20px;
-            border: 1px solid var(--glass);
-            transition: transform 0.2s;
-            animation: fadeIn 0.4s ease-out;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px -15px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .ticket-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .ticket-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px -15px var(--primary-glow);
+        }
 
         .ticket-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 16px;
+            align-items: center;
         }
 
         .ticket-id {
             font-weight: 700;
             color: var(--primary);
-            font-size: 14px;
+            font-size: 13px;
             text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
 
         .ticket-date {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
         }
 
         .ticket-reason {
-            font-size: 15px;
+            font-size: 14px;
             line-height: 1.6;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            color: #e2e8f0;
         }
 
         .ticket-footer {
             font-size: 12px;
             color: var(--text-muted);
-            border-top: 1px solid var(--glass);
-            padding-top: 12px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 16px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .session-dot {
@@ -113,21 +191,42 @@
             height: 8px;
             background: #38bdf8;
             border-radius: 50%;
+            box-shadow: 0 0 8px #38bdf8;
+        }
+
+        .resolve-btn {
+            background: rgba(244, 63, 94, 0.08);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            color: #fda4af;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .resolve-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px var(--primary-glow);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .empty-state {
             text-align: center;
             grid-column: 1 / -1;
-            padding: 100px;
+            padding: 80px 24px;
             color: var(--text-muted);
-            background: var(--glass);
+            background: rgba(255, 255, 255, 0.01);
             border-radius: 24px;
-            border: 2px dashed var(--glass);
+            border: 2px dashed var(--glass-border);
+            font-size: 15px;
         }
     </style>
 </head>
@@ -135,8 +234,26 @@
     <div class="container">
         <header>
             <h1>Support Tickets</h1>
-            <button class="refresh-btn" onclick="fetchTickets()">Refresh Dashboard</button>
+            <div class="header-actions">
+                <a href="/" class="btn btn-chat">
+                    ← Chat Client
+                </a>
+                <button class="btn" onclick="fetchTickets()">
+                    Refresh
+                </button>
+            </div>
         </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Open Tickets</div>
+                <div class="stat-value" id="stats-total">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Response SLA</div>
+                <div class="stat-value" style="color: #38bdf8;">&lt; 24h</div>
+            </div>
+        </div>
 
         <div class="ticket-grid" id="ticket-grid">
             <!-- Tickets will appear here -->
@@ -146,9 +263,12 @@
     <script>
         async function fetchTickets() {
             const grid = document.getElementById('ticket-grid');
+            const totalEl = document.getElementById('stats-total');
             try {
                 const response = await fetch('/tickets');
                 const tickets = await response.json();
+
+                totalEl.textContent = tickets.length;
 
                 if (tickets.length === 0) {
                     grid.innerHTML = '<div class="empty-state">No open tickets. AI is handling everything! 🚀</div>';
@@ -156,15 +276,20 @@
                 }
 
                 grid.innerHTML = tickets.map(t => `
-                    <div class="ticket-card">
-                        <div class="ticket-header">
-                            <span class="ticket-id">Ticket #${t.id}</span>
-                            <span class="ticket-date">${new Date(t.created_at).toLocaleString()}</span>
+                    <div class="ticket-card" id="ticket-${t.id}">
+                        <div>
+                            <div class="ticket-header">
+                                <span class="ticket-id">Ticket #${t.id}</span>
+                                <span class="ticket-date">${new Date(t.created_at).toLocaleString()}</span>
+                            </div>
+                            <div class="ticket-reason">${t.reason}</div>
                         </div>
-                        <div class="ticket-reason">${t.reason}</div>
                         <div class="ticket-footer">
-                            <div class="session-dot"></div>
-                            User: ${t.session_id}
+                            <div class="user-info">
+                                <div class="session-dot"></div>
+                                <span>User: ${t.session_id}</span>
+                            </div>
+                            <button class="resolve-btn" onclick="resolveTicket(${t.id})">Resolve</button>
                         </div>
                     </div>
                 `).join('');
@@ -173,8 +298,31 @@
             }
         }
 
+        async function resolveTicket(id) {
+            if (!confirm(`Are you sure you want to resolve and archive Ticket #${id}?`)) return;
+            try {
+                const response = await fetch(`/tickets/${id}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    const card = document.getElementById(`ticket-${id}`);
+                    if (card) {
+                        card.style.transform = 'scale(0.9)';
+                        card.style.opacity = '0';
+                        setTimeout(fetchTickets, 300);
+                    } else {
+                        fetchTickets();
+                    }
+                } else {
+                    alert('Failed to resolve ticket.');
+                }
+            } catch (err) {
+                alert('Error connecting to server.');
+            }
+        }
+
         fetchTickets();
-        setInterval(fetchTickets, 30000); // Auto-refresh every 30s
+        setInterval(fetchTickets, 15000); // Auto-refresh every 15s
     </script>
 </body>
 </html>

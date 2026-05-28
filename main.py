@@ -60,6 +60,16 @@ async def get_all_tickets():
             for t in tickets
         ]
 
+@app.delete("/tickets/{ticket_id}", tags=["Data"])
+async def resolve_ticket(ticket_id: int):
+    """Resolve and delete a support ticket."""
+    from tools.db_client import delete_ticket
+    from fastapi import HTTPException
+    success = delete_ticket(ticket_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    return {"status": "success", "message": f"Ticket #{ticket_id} resolved."}
+
 @app.get("/health", tags=["Health"])
 async def health_check() -> dict:
     """Simple liveness probe."""

@@ -18,23 +18,23 @@ logger = logging.getLogger("Orchestrator")
 # Define Tool Functions globally for Gemini inspection
 def faq(query: str) -> str:
     """Answer product or policy FAQs using semantic search."""
-    pass
+    return ""
 
 def order(order_id: str) -> str:
     """Look up details and status for a specific order ID."""
-    pass
+    return ""
 
 def refund(order_id: str) -> str:
     """Check if an order is eligible for a refund or initiate a refund."""
-    pass
+    return ""
 
 def billing(query: str) -> str:
     """Handle questions about invoices, payments, or subscriptions."""
-    pass
+    return ""
 
 def escalate(reason: str) -> str:
     """Escalate to a human agent when the AI cannot resolve the issue."""
-    pass
+    return ""
 
 class Orchestrator:
     def __init__(self):
@@ -87,6 +87,9 @@ class Orchestrator:
             
             contents = []
             for h in raw_history:
+                # Skip any history entries with missing/None content (from previous failed turns)
+                if not h.get("content"):
+                    continue
                 role = "user" if h["role"] == "user" else "model"
                 contents.append(types.Content(role=role, parts=[types.Part(text=h["content"])]))
 
@@ -95,21 +98,43 @@ class Orchestrator:
             config = types.GenerateContentConfig(
                 tools=self.tools,
                 automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
-                system_instruction="You are a helpful customer support AI. Use tools for orders/FAQs."
+                system_instruction=(
+                    "You are a friendly and knowledgeable AI assistant. "
+                    "You can answer general knowledge questions, have casual conversations, and help with any topic. "
+                    "Additionally, you have specialized tools for customer support tasks — use them when the user asks about: "
+                    "specific order status or tracking (use 'order' tool), "
+                    "refund eligibility or requests (use 'refund' tool), "
+                    "billing, invoices, or payment questions (use 'billing' tool), "
+                    "product or policy FAQs (use 'faq' tool), "
+                    "or when you cannot resolve an issue and need to escalate (use 'escalate' tool). "
+                    "For everything else — general questions, greetings, advice, calculations, etc. — just answer directly without using any tools."
+                )
             )
 
             # --- INITIAL GENERATION WITH FALLBACK ---
             response, model_idx = await self._call_gemini_with_fallback(user_content, config)
 
-            if not response.candidates or not response.candidates[0].content.parts:
+            candidates = response.candidates
+            if not candidates or not isinstance(candidates, list) or len(candidates) == 0:
                 return "The AI engine is currently resting. Please try again in a moment."
 
-            part = response.candidates[0].content.parts[0]
+            content = candidates[0].content
+            if not content or not hasattr(content, "parts") or not content.parts:
+                return "The AI engine is currently resting. Please try again in a moment."
+
+            parts = content.parts
+            if not isinstance(parts, list) or len(parts) == 0:
+                return "The AI engine is currently resting. Please try again in a moment."
+
+            part = parts[0]
             
             if part.function_call:
                 fn = part.function_call
                 agent_name = fn.name
-                args = fn.args
+                if not agent_name:
+                    return "I'm sorry, I'm having a technical issue routing your request."
+
+                args = dict(fn.args) if fn.args else {}
                 logger.info(f"Tool Requested: {agent_name} (using {self.models[model_idx]})")
                 
                 if agent_name == "escalate": args["session_id"] = session_id
@@ -120,18 +145,19 @@ class Orchestrator:
                     
                     # --- FOLLOW-UP WITH FALLBACK ---
                     followup_content = user_content + [
-                        response.candidates[0].content,
+                        content,
                         types.Content(role="user", parts=[types.Part.from_function_response(
                             name=agent_name, response={"result": result}
                         )])
                     ]
                     # Start from the same model that worked before to be efficient
                     final_response, _ = await self._call_gemini_with_fallback(followup_content, config, model_idx)
-                    answer = final_response.text
+                    # .text returns None when response only has non-text parts (e.g. another function_call)
+                    answer = final_response.text or "I've processed your request. Is there anything else I can help you with?"
                 else:
                     answer = "I'm sorry, I'm having a technical issue routing your request."
             else:
-                answer = response.text
+                answer = response.text or "I'm sorry, I couldn't generate a response. Please try again."
 
             # Update history
             raw_history.append({"role": "user", "content": message})
